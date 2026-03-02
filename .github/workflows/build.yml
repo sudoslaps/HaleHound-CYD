@@ -1,0 +1,33 @@
+name: Build HaleHound E32R40T
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:   # lets you trigger a build manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build firmware (E32R40T)
+        run: pio run -e esp32-e32r40t
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HaleHound-E32R40T-firmware
+          path: .pio/build/esp32-e32r40t/firmware.bin
+          retention-days: 30
